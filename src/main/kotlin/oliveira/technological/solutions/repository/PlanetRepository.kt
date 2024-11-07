@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PlanetRepository: CrudRepository<Planet, Long> {
-    fun findByName(name:String):Planet?
+interface PlanetRepository : CrudRepository<Planet, String> {
+    fun findByName(name: String): Planet?
 }

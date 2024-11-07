@@ -14,8 +14,8 @@ class AppController {
     lateinit var planetRepository: PlanetRepository
 
     @GetMapping
-    fun list(@RequestParam id: Long = 0, name: String = ""): Any {
-        if (id.toInt() != 0) {
+    fun list(@RequestParam id: String = "", name: String = ""): Any {
+        if (id != "") {
             val resultById = planetRepository.findById(id)
             return ResponseEntity.ok(resultById)
         } else if (name != "") {
@@ -27,39 +27,26 @@ class AppController {
         return ResponseEntity.ok(result)
     }
 
-    @PostMapping
-    fun add(
-        @RequestBody(required = false)
-        planet: Planet
-    ): ResponseEntity<out Any> {
-        val planetAlreadyExist = planetRepository.findByName(planet.name)
-        if (planetAlreadyExist == null) {
-            val planetAdded =  planetRepository.save(planet)
-            return ResponseEntity.ok(planetAdded)
-        }
-        return ResponseEntity.status(409).body("message:\"Planet already exists\"")
+    //TODO: CREATE a route Get{ID} to obtain a resource by id
 
-    }
 
     @PutMapping("{id}")
-    fun update(
+    fun createOrUpdate(
         @PathVariable
-        id: Long,
+        id: String,
         @RequestBody
         body: Planet
     ): Any {
-        if (planetRepository.existsById(id)) {
-            val planet = body.copy(id = id)
-            val planetUpdated = planetRepository.save(planet)
-            return ResponseEntity.noContent()
-        }
-        return ResponseEntity.status(409).body("message:\"Planet already exists\"")
+        val planet = body.copy(id = id)
+        planetRepository.save(planet)
+
+        return ResponseEntity.noContent().build<Void>()
     }
 
     @DeleteMapping("{id}")
     fun remove(
         @PathVariable
-        id: Long
+        id: String
     ): ResponseEntity.HeadersBuilder<*> {
         if (planetRepository.existsById(id)) {
             planetRepository.deleteById(id)
