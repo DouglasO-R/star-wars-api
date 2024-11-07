@@ -43,7 +43,13 @@ class AppController() {
     lateinit var planetRepository:PlanetRepository
 
     @GetMapping()
-    fun list(): MutableIterable<Planet> {
+    fun list(@RequestParam id: Long = 0, name: String = ""): Any {
+        if (id.toInt() != 0 ){
+            return planetRepository.findById(id)
+        }else if (name != ""){
+            return planetRepository.findByName(name)
+        }
+
         return planetRepository.findAll()
     }
 
@@ -52,6 +58,7 @@ class AppController() {
         @RequestBody(required = false)
         planet: Planet
     ): Planet {
+
         return planetRepository.save(planet)
     }
 
@@ -79,15 +86,5 @@ class AppController() {
         }
 
     }
-
-//    @GetMapping("{id}")
-//    fun searchById(@PathVariable("id") id: Long): Optional<Planet> {
-//        return planetRepository.findById(id)
-//    }
-//
-//    @GetMapping("{name}")
-//    fun searchByName(@PathVariable("name") name:String): List<Planet> {
-//        return planetRepository.findByName(name)
-//    }
 }
 
