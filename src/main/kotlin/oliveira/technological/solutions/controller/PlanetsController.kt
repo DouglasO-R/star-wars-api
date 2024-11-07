@@ -55,11 +55,8 @@ class PlanetsController {
     fun remove(
         @PathVariable id: String
     ): ResponseEntity<Any> {
-        if (planetRepository.existsById(id)) {
             planetRepository.deleteById(id)
             return ResponseEntity.noContent().build()
-        }
-        return ResponseEntity.notFound().build()
     }
 }
 
