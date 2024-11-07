@@ -3,6 +3,7 @@ package oliveira.technological.solutions.controller
 import oliveira.technological.solutions.model.Planet
 import oliveira.technological.solutions.repository.PlanetRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -24,15 +25,20 @@ class PlanetsController {
         return ResponseEntity.ok(result)
     }
 
-    //TODO: CREATE a route Get{ID} to obtain a resource by id
+
+    @GetMapping("{id}")
+    fun searchById(
+        @PathVariable id: String
+    ): Any {
+        val planet = planetRepository.findByIdOrNull(id) ?: return ResponseEntity.notFound().build<Void>()
+
+        return ResponseEntity.ok(planet)
+    }
 
 
     @PutMapping("{id}")
     fun createOrUpdate(
-        @PathVariable
-        id: String,
-        @RequestBody
-        body: Planet
+        @PathVariable id: String, @RequestBody body: Planet
     ): Any {
         val existingPlanet = planetRepository.findByName(body.name)
         if (existingPlanet.isNotEmpty() && existingPlanet.first().id != id) {
@@ -47,8 +53,7 @@ class PlanetsController {
 
     @DeleteMapping("{id}")
     fun remove(
-        @PathVariable
-        id: String
+        @PathVariable id: String
     ): ResponseEntity<Any> {
         if (planetRepository.existsById(id)) {
             planetRepository.deleteById(id)
