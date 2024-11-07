@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/planets")
-class AppController {
+class PlanetsController {
     @Autowired
     lateinit var planetRepository: PlanetRepository
 
@@ -34,6 +34,10 @@ class AppController {
         @RequestBody
         body: Planet
     ): Any {
+        if (planetRepository.findByName(body.name).isNotEmpty()) {
+           return ResponseEntity.status(409).body(Response(409,"Planet already exists"))
+        }
+
         val planet = body.copy(id = id)
         planetRepository.save(planet)
 
@@ -52,3 +56,6 @@ class AppController {
         return ResponseEntity.notFound().build()
     }
 }
+
+
+data class Response(val status:Int,val message:String)
