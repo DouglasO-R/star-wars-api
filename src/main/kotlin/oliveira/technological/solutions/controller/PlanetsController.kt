@@ -34,8 +34,9 @@ class PlanetsController {
         @RequestBody
         body: Planet
     ): Any {
-        if (planetRepository.findByName(body.name).isNotEmpty()) {
-           return ResponseEntity.status(409).body(Response(409,"Planet already exists"))
+        val existingPlanet = planetRepository.findByName(body.name)
+        if (existingPlanet.isNotEmpty() && existingPlanet.first().id != id) {
+            return ResponseEntity.status(409).body(Response(409, "Planet already exists"))
         }
 
         val planet = body.copy(id = id)
@@ -58,4 +59,4 @@ class PlanetsController {
 }
 
 
-data class Response(val status:Int,val message:String)
+data class Response(val status: Int, val message: String)
