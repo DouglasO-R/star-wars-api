@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PlanetRepository : CrudRepository<Planet, String> {
-    fun findByName(name: String): Planet?
+    fun findByName(name: String): List<Planet>
 }

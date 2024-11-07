@@ -14,11 +14,8 @@ class AppController {
     lateinit var planetRepository: PlanetRepository
 
     @GetMapping
-    fun list(@RequestParam id: String = "", name: String = ""): Any {
-        if (id != "") {
-            val resultById = planetRepository.findById(id)
-            return ResponseEntity.ok(resultById)
-        } else if (name != "") {
+    fun list(@RequestParam name: String = ""): Any {
+        if (name != "") {
             val resultByName = planetRepository.findByName(name)
             return ResponseEntity.ok(resultByName)
         }
