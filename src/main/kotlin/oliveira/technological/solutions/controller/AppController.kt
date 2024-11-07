@@ -47,12 +47,11 @@ class AppController {
     fun remove(
         @PathVariable
         id: String
-    ): ResponseEntity.HeadersBuilder<*> {
+    ): ResponseEntity<Any> {
         if (planetRepository.existsById(id)) {
             planetRepository.deleteById(id)
-            return ResponseEntity.noContent()
-
+            return ResponseEntity.noContent().build()
         }
-        return ResponseEntity.notFound()
+        return ResponseEntity.notFound().build()
     }
 }
