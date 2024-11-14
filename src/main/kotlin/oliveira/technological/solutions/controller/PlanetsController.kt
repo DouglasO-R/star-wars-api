@@ -1,5 +1,6 @@
 package oliveira.technological.solutions.controller
 
+import jakarta.validation.ConstraintViolationException
 import oliveira.technological.solutions.model.Planet
 import oliveira.technological.solutions.repository.PlanetRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,3 +63,13 @@ class PlanetsController {
 
 
 data class Response(val status: Int, val message: String)
+
+@ControllerAdvice
+class ErrorController{
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolatesException(ex:ConstraintViolationException):ResponseEntity<Response>{
+        return ResponseEntity.status(400).body(Response(400, ex.constraintViolations.first().message!!))
+    }
+}
+
