@@ -13,3 +13,7 @@ the IntelliJ and the introduction to Spring Boot.
 Try to no only copy. Before you copy it, give yourself at least 10-15 seconds to see if 
 you can remember how to do it. Avoid try and error.
 Do mistakes it is fine but try and error does not help to fix the information.
+
+## todo 
+Add PostGreSql
+Add Basic Integration Test
