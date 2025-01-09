@@ -44,7 +44,7 @@ class PlanetsController {
     ): Any {
         val existingPlanet = planetRepository.findByName(body.name)
         if (existingPlanet.isNotEmpty() && existingPlanet.first().id != id) {
-            return ResponseEntity.status(409).body(Response(409, "Planet already exists"))
+            return ResponseEntity.status(409).body(Error(409, "Planet already exists"))
         }
 
         val planet = body.copy(id = id)
@@ -64,14 +64,14 @@ class PlanetsController {
 
 
 @Serializable
-data class Response(val status: Int, val message: String)
+data class Error(val status: Int, val message: String)
 
 @ControllerAdvice
 class ErrorController{
 
     @ExceptionHandler(ConstraintViolationException::class)
-    fun handleConstraintViolatesException(ex:ConstraintViolationException):ResponseEntity<Response>{
-        return ResponseEntity.status(400).body(Response(400, ex.constraintViolations.first().message!!))
+    fun handleConstraintViolatesException(ex:ConstraintViolationException):ResponseEntity<Error>{
+        return ResponseEntity.status(400).body(Error(400, ex.constraintViolations.first().message!!))
     }
 }
 

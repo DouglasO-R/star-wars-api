@@ -8,12 +8,14 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import oliveira.technological.solutions.model.Planet
+import oliveira.technological.solutions.repository.PlanetRepository
+import org.aspectj.lang.annotation.Before
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.BeforeEach
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import kotlin.test.Test
@@ -25,6 +27,9 @@ class PlanetsControllerTest {
     @LocalServerPort
     lateinit var port: String
 
+    @Autowired
+    lateinit var repository:PlanetRepository
+
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -34,8 +39,13 @@ class PlanetsControllerTest {
         }
     }
 
+    @BeforeEach()
+    fun setupClean(){
+        repository.deleteAll()
+    }
+
     @Test
-    fun shouldCreateRetrieveAndRemoveAPlanet(): Unit = runBlocking {
+    fun `should Create Retrieve And Remove APlanet`(): Unit = runBlocking {
         val planetToCreate = Planet(name = "Albania", climate = "tropical", terrain = "tropical forest")
         val listCreatedPlanet: List<Planet> = listOf(
             Planet(
@@ -74,12 +84,11 @@ class PlanetsControllerTest {
         val retrieveUpdatedResponseBody: List<Planet> = retrieveUpdatedResponse.body()
 
         val removeResponse = client.delete("http://localhost:${port}/planets/2cec3d8e-0857-4769-b3ad-75069c73d42b")
+        val secondRemoveResponse =
+            client.delete("http://localhost:${port}/planets/2cec3d8e-0857-4769-b3ad-75069c73d42b")
 
-        val retrieveRemovedResponse: HttpResponse = client.get("http://localhost:${port}/planets")
-        val retrieveRemovedResponseBody: List<Planet> = retrieveRemovedResponse.body()
-
-//        TODO() Retrieve ,update and remove one planet
-//
+        val retrieveRemovedResponse: HttpResponse =
+            client.get("http://localhost:${port}/planets/2cec3d8e-0857-4769-b3ad-75069c73d42b")
 
 //        Create
         assertThat(createdResponse.status).isEqualTo(HttpStatusCode.NoContent)
@@ -99,24 +108,24 @@ class PlanetsControllerTest {
 
 //        Remove
         assertThat(removeResponse.status).isEqualTo(HttpStatusCode.NoContent)
+        assertThat(secondRemoveResponse.status).isEqualTo(HttpStatusCode.NoContent)
 
 
 //        Retrieve Remove
-        assertThat(retrieveRemovedResponse.status).isEqualTo(HttpStatusCode.OK)
-        assertThat(retrieveRemovedResponseBody.size).isEqualTo(0)
+        assertThat(retrieveRemovedResponse.status).isEqualTo(HttpStatusCode.NotFound)
 
     }
 
     @Test
-    fun `can not have 2 planets with same name and id`(){
+    fun `can not have 2 planets with same name and id`() {
 //        TODO() can not have 2 planets with same name and id
 //        TODO tes errors in application
 
-        val planetToCreate1 = Planet(name = "Albania", climate = "tropical", terrain = "tropical forest")
-        val planetToCreate2 = Planet(name = "Yavin IV", climate = "Temperate, tropical", terrain = "Jungle, rainforests")
-        val planetToCreateWithNameAlreadyExist = Planet(name = "Albania", climate = "arid", terrain = "desert")
-        val planetToCreateWithoutClimate = Planet(name = "Tatooine", climate = "", terrain = "desert")
-        val planetToCreateWithoutTerrain = Planet(name = "Aladus", climate = "tropical", terrain = "")
+        val planetToCreate1 = Planet(name = "Kalinor", climate = "tropical", terrain = "tropical forest")
+        val planetToCreate2 = Planet(name = "Luthar IV", climate = "Temperate, tropical", terrain = "Jungle, rainforests")
+        val planetToCreateWithNameAlreadyExist = Planet(name = "Kalinor", climate = "arid", terrain = "desert")
+        val planetToCreateWithoutClimate = Planet(name = "Ballatus", climate = "", terrain = "desert")
+        val planetToCreateWithoutTerrain = Planet(name = "Kadmus", climate = "tropical", terrain = "")
 
         val id1 = "13594cf8-94c6-4ae0-8f6b-dca86e44bbb4"
         val id2 = "2f1a5d4a-a3a2-4f62-9802-2a355c05e09b"
@@ -160,25 +169,25 @@ class PlanetsControllerTest {
             }
         }
 
-        val createdResponseWithNameAlreadyExistBody:Response = runBlocking { createdResponseWithNameAlreadyExist.body() }
-        val createdResponseWithoutClimateBody:Response = runBlocking { createdResponseWithoutClimate.body() }
-        val createdResponseWithoutTerrainBody:Response = runBlocking { createdResponseWithoutTerrain.body() }
+        val createdResponseWithNameAlreadyExistBody: Error = runBlocking { createdResponseWithNameAlreadyExist.body() }
+        val createdResponseWithoutClimateBody: Error = runBlocking { createdResponseWithoutClimate.body() }
+        val createdResponseWithoutTerrainBody: Error = runBlocking { createdResponseWithoutTerrain.body() }
 
-        val retrieveResponse: List<Planet>  = runBlocking {
+        val retrieveResponse: List<Planet> = runBlocking {
             client.get("http://localhost:${port}/planets").body()
         }
 
         assertThat(retrieveResponse.size).isEqualTo(2)
 
         assertThat(createdResponseWithNameAlreadyExist.status).isEqualTo(HttpStatusCode.Conflict)
-        assertThat(createdResponseWithNameAlreadyExistBody).isEqualTo(Response(409, "Planet already exists"))
+        assertThat(createdResponseWithNameAlreadyExistBody).isEqualTo(Error(409, "Planet already exists"))
 
         assertThat(createdResponseWithoutClimate.status).isEqualTo(HttpStatusCode.BadRequest)
-        assertThat(createdResponseWithoutClimateBody).isEqualTo(Response(400, "não deve estar vazio"))
+        assertThat(createdResponseWithoutClimateBody).isEqualTo(Error(400, "não deve estar vazio"))
 
 
         assertThat(createdResponseWithoutTerrain.status).isEqualTo(HttpStatusCode.BadRequest)
-        assertThat(createdResponseWithoutTerrainBody).isEqualTo(Response(400, "não deve estar vazio"))
+        assertThat(createdResponseWithoutTerrainBody).isEqualTo(Error(400, "não deve estar vazio"))
 
     }
 
