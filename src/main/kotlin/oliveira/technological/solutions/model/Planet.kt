@@ -4,10 +4,11 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
-implementation("io.ktor:ktor-client-core:$ktor_version")
-implementation("io.ktor:ktor-client-cio:$ktor_version")
+import kotlinx.serialization.Serializable
+
 
 @Entity
+@Serializable
 data class Planet(
     @Id
     val id: String? = null,

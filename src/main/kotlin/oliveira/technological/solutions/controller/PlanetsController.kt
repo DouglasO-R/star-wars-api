@@ -1,6 +1,7 @@
 package oliveira.technological.solutions.controller
 
 import jakarta.validation.ConstraintViolationException
+import kotlinx.serialization.Serializable
 import oliveira.technological.solutions.model.Planet
 import oliveira.technological.solutions.repository.PlanetRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,6 +63,7 @@ class PlanetsController {
 }
 
 
+@Serializable
 data class Response(val status: Int, val message: String)
 
 @ControllerAdvice
