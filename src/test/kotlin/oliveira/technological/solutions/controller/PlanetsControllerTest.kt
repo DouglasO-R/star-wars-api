@@ -118,8 +118,6 @@ class PlanetsControllerTest {
 
     @Test
     fun `can not have 2 planets with same name and id`() {
-//        TODO() can not have 2 planets with same name and id
-//        TODO tes errors in application
 
         val planetToCreate1 = Planet(name = "Kalinor", climate = "tropical", terrain = "tropical forest")
         val planetToCreate2 = Planet(name = "Luthar IV", climate = "Temperate, tropical", terrain = "Jungle, rainforests")
