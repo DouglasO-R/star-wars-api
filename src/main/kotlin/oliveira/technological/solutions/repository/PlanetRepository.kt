@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PlanetRepository : CrudRepository<Planet, String> {
     fun findByName(name: String): List<Planet>
+    fun findAllByNameContainingIgnoreCase(name: String): List<Planet>
+
 }

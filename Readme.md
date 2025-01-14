@@ -15,5 +15,8 @@ you can remember how to do it. Avoid try and error.
 Do mistakes it is fine but try and error does not help to fix the information.
 
 ## todo 
-Add PostGreSql
-Add Basic Integration Test
+- [x] Add PostGreSql
+- [X] Add Basic Integration Test
+- [] complete test with other engines(webclient,restTemplate,retrofit)
+- [x] search by part of name
+- [] test repository (data jpa test)

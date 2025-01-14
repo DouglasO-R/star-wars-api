@@ -19,7 +19,7 @@ class PlanetsController {
     @GetMapping
     fun list(@RequestParam name: String = ""): Any {
         if (name != "") {
-            val resultByName = planetRepository.findByName(name)
+            val resultByName = planetRepository.findAllByNameContainingIgnoreCase(name)
             return ResponseEntity.ok(resultByName)
         }
 
