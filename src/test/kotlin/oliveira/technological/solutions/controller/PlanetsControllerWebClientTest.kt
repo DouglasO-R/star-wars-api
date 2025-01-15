@@ -1,9 +1,12 @@
 package oliveira.technological.solutions.controller
 
+import io.github.cdimascio.dotenv.Dotenv
+import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.*
 import oliveira.technological.solutions.model.Planet
 import oliveira.technological.solutions.repository.PlanetRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -23,6 +26,18 @@ class PlanetsControllerWebClientTest {
 
     @Autowired
     lateinit var repository: PlanetRepository
+
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        fun loadEnv() {
+            val dotenv = dotenv()
+
+            System.setProperty("DATABASE_URL", dotenv["DATABASE_URL"])
+            System.setProperty("DATABASE_USERNAME", dotenv["DATABASE_USERNAME"])
+            System.setProperty("DATABASE_PASSWORD", dotenv["DATABASE_PASSWORD"])
+        }
+    }
 
     @BeforeEach()
     fun setupClean() {
@@ -191,7 +206,7 @@ class PlanetsControllerWebClientTest {
             .expectBody(Error::class.java)
             .returnResult()
 
-        //erro
+        // error
 //        val retrieveResponse = webTestClient.get()
 //            .uri("/planets")
 //            .exchange()

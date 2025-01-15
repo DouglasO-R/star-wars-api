@@ -17,7 +17,7 @@ class PlanetsController {
     lateinit var planetRepository: PlanetRepository
 
     @GetMapping
-    fun list(@RequestParam name: String = ""): Any {
+    fun list(@RequestParam name: String = ""): ResponseEntity<out Iterable<Planet>> {
         if (name != "") {
             val resultByName = planetRepository.findAllByNameContainingIgnoreCase(name)
             return ResponseEntity.ok(resultByName)
