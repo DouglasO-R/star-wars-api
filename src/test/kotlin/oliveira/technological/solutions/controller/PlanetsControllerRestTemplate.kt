@@ -1,6 +1,5 @@
 package oliveira.technological.solutions.controller
 
-import io.github.cdimascio.dotenv.dotenv
 import io.ktor.http.*
 import oliveira.technological.solutions.model.Planet
 import oliveira.technological.solutions.repository.PlanetRepository
@@ -33,17 +32,6 @@ class PlanetsControllerRestTemplate {
     @Autowired
     lateinit var repository: PlanetRepository
 
-    companion object {
-        @BeforeAll
-        @JvmStatic
-        fun loadEnv() {
-            val dotenv = dotenv()
-
-            System.setProperty("DATABASE_URL", dotenv["DATABASE_URL"])
-            System.setProperty("DATABASE_USERNAME", dotenv["DATABASE_USERNAME"])
-            System.setProperty("DATABASE_PASSWORD", dotenv["DATABASE_PASSWORD"])
-        }
-    }
 
     @BeforeEach()
     fun setupClean() {
@@ -149,8 +137,7 @@ class PlanetsControllerRestTemplate {
     fun `can not have 2 planets with the same name and id`() {
         //given
         val planetToCreate1 = Planet(name = "Kalinor", climate = "tropical", terrain = "tropical forest")
-        val planetToCreate2 =
-            Planet(name = "Luthar IV", climate = "Temperate, tropical", terrain = "Jungle, rainforests")
+        val planetToCreate2 = Planet(name = "Luthar IV", climate = "Temperate, tropical", terrain = "Jungle, rainforests")
         val planetToCreateWithNameAlreadyExist = Planet(name = "Kalinor", climate = "arid", terrain = "desert")
         val planetToCreateWithoutClimate = Planet(name = "Ballatus", climate = "", terrain = "desert")
         val planetToCreateWithoutTerrain = Planet(name = "Kadmus", climate = "tropical", terrain = "")
@@ -168,7 +155,7 @@ class PlanetsControllerRestTemplate {
         val id5 = "4a68be6a-39db-4509-8239-35935560db9d"
 
         val createdFirstPlanet = planetToCreate1.copy(id = id1)
-        val createdSecondPlanet = planetToCreate1.copy(id = id2)
+        val createdSecondPlanet = planetToCreate2.copy(id = id2)
         val listPlanets = listOf(createdFirstPlanet, createdSecondPlanet)
 
         //when
@@ -207,15 +194,15 @@ class PlanetsControllerRestTemplate {
             Error::class.java
         )
 
-//        val retrieveResponse: ResponseEntity<List<Planet>> = restTemplate.exchange(
-//            "$baseUrl$port/planets/",
-//            HttpMethod.GET,
-//            null,
-//            object : ParameterizedTypeReference<List<Planet>>() {}
-//        )
-//
-//
-//        assertThat(retrieveResponse.body).isEqualTo(listPlanets)
+        val retrieveResponse: ResponseEntity<List<Planet>> = restTemplate.exchange(
+            "$baseUrl$port/planets",
+            HttpMethod.GET,
+            null,
+            object : ParameterizedTypeReference<List<Planet>>() {}
+        )
+
+
+        assertThat(retrieveResponse.body).isEqualTo(listPlanets)
 
         assertThat(responsePlanetToCreateWithNameAlreadyExist.statusCode).isEqualTo(HttpStatus.CONFLICT)
         assertThat(responsePlanetToCreateWithNameAlreadyExist.body).isEqualTo(Error(409, "Planet already exists"))
@@ -228,4 +215,6 @@ class PlanetsControllerRestTemplate {
         assertThat(responsePlanetToCreateWithoutTerrain.body).isEqualTo(Error(400, "não deve estar vazio"))
 
     }
+
+
 }
